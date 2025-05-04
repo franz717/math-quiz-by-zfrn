@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Math Quiz Game</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: linear-gradient(to right, #e0f7fa, #ffffff);
+      margin: 0;
+    }
+    .container {
+      background: #ffffff;
+      padding: 2rem;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      max-width: 450px;
+      width: 100%;
+      text-align: center;
+    }
+    button {
+      margin: 0.5rem;
+      padding: 1rem 1.5rem;
+      font-size: 1rem;
+      border: none;
+      border-radius: 10px;
+      background: #007bff;
+      color: white;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+    button:active {
+      transform: scale(0.95);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    }
+    .question {
+      font-size: 1.4rem;
+      margin-bottom: 1rem;
+    }
+    .timer {
+      font-size: 1rem;
+      margin-bottom: 1rem;
+      color: #333;
+    }
+    input, .options button {
+      padding: 0.75rem;
+      width: 100%;
+      font-size: 1rem;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+    .options {
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+      margin-bottom: 1rem;
+    }
+    .options button {
+      margin: 0;
+      transition: background 0.3s, transform 0.2s ease-in-out;
+    }
+    .options button:hover {
+      background: #0056b3;
+    }
+    .options button:active {
+      transform: scale(0.95);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    }
+    .difficulty-text {
+      margin-top: 10px;
+      font-size: 1.2rem;
+    }
+    .bgm-btn {
+      background-color: #28a745;
+      color: white;
+      font-size: 1rem;
+      padding: 1rem 1.5rem;
+      margin-top: 1rem;
+      cursor: pointer;
+    }
+    .bgm-btn:hover {
+      background-color: #218838;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div id="start-screen">
+      <h2>Pilih Kesulitan</h2>
+      <button onclick="startGame('veryeasy')">Very Easy</button>
+      <button onclick="startGame('easy')">Easy</button>
+      <button onclick="startGame('medium')">Medium</button>
+      <button onclick="startGame('hard')">Hard</button>
+      <button onclick="startGame('veryhard')">Very Hard</button>
+      <button onclick="startGame('expert')">Expert</button>
+      <div class="difficulty-text">
+        <p><strong>Jumlah Soal:</strong></p>
+        <p>Very Easy: 5 soal</p>
+        <p>Easy: 10 soal</p>
+        <p>Medium: 15 soal</p>
+        <p>Hard: 20 soal</p>
+        <p>Very Hard: 30 soal</p>
+        <p>Expert: 40 soal</p>
+      </div>
+      <button id="bgm-toggle-btn" class="bgm-btn" onclick="toggleBGM()">Putar Musik</button>
+    </div>
+
+    <div id="quiz-screen" style="display:none;">
+      <div class="question" id="question"></div>
+      <div class="timer" id="timer"></div>
+      <div class="options" id="options"></div>
+      <input type="number" id="answer" placeholder="Jawaban Anda" style="display:none;" />
+      <button onclick="submitAnswer()">Submit</button>
+    </div>
+
+    <div id="result-screen" style="display:none;">
+      <h2 id="result"></h2>
+      <h3>Hasil Detail</h3>
+      <ul id="incorrect-questions"></ul>
+      <button onclick="location.reload()">Main Lagi</button>
+    </div>
+  </div>
+
+  <!-- Menambahkan Elemen Audio untuk BGM -->
+  <audio id="background-music" loop>
+    <source src="Vocaroo 173S3BxwpcvN.mp3" type="audio/mp3" />
+    Your browser does not support the audio element.
+  </audio>
+  
+  <!-- Menambahkan Elemen Audio untuk Musik "Hope to See You Again" -->
+  <audio id="hope-music" loop>
+    <source src="path_to_hope_to_see_you_again_instrumental.mp3" type="audio/mp3" />
+    Your browser does not support the audio element.
+  </audio>
+
+  <script>
+    let bgmPlaying = false;
+    const music = document.getElementById('background-music');
+    const hopeMusic = document.getElementById('hope-music');
+    
+    function toggleBGM() {
+      if (bgmPlaying) {
+        music.pause(); // Hentikan musik Fukashigi no Carte
+        hopeMusic.pause(); // Hentikan musik Hope to See You Again
+        document.getElementById('bgm-toggle-btn').textContent = "Putar Musik";
+      } else {
+        music.play(); // Mulai musik Fukashigi no Carte
+        hopeMusic.play(); // Mulai musik Hope to See You Again
+        music.volume = 0.5; // Atur volume musik Fukashigi no Carte
+        hopeMusic.volume = 0.5; // Atur volume musik Hope to See You Again
+        document.getElementById('bgm-toggle-btn').textContent = "Hentikan Musik";
+      }
+      bgmPlaying = !bgmPlaying;
+    }
+
+    const difficulties = {
+      veryeasy: { total: 5, mcq: 3, time: 25, operators: ["+"], range: [1, 10] },
+      easy: { total: 10, mcq: 5, time: 20, operators: ["+", "-"], range: [1, 20] },
+      medium: { total: 15, mcq: 8, time: 15, operators: ["+", "-", "/"], range: [21, 39] },
+      hard: { total: 20, mcq: 12, time: 10, operators: ["+", "-", "*", "/"], range: [40, 59] },
+      veryhard: { total: 30, mcq: 18, time: 8, operators: ["+", "-", "*", "/"], range: [60, 99] },
+      expert: { total: 40, mcq: 20, time: 7, operators: ["+", "-", "*", "/", "√"], range: [100, 200] },
+    };
+
+    let currentDifficulty = "";
+    let currentQuestion = 0;
+    let correctAnswers = 0;
+    let totalQuestions = 0;
+    let timePerQuestion = 0;
+    let mcqLimit = 0;
+    let currentAnswer = 0;
+    let timerInterval;
+    let currentIsMCQ = true;
+    let incorrectQuestions = [];
+
+    function startGame(difficulty) {
+      currentDifficulty = difficulty;
+      const config = difficulties[difficulty];
+      totalQuestions = config.total;
+      mcqLimit = config.mcq;
+      timePerQuestion = config.time;
+      incorrectQuestions = [];
+      document.getElementById("start-screen").style.display = "none";
+      document.getElementById("quiz-screen").style.display = "block";
+      nextQuestion();
+    }
+
+    function generateQuestion(isMCQ) {
+      const config = difficulties[currentDifficulty];
+      const ops = config.operators;
+      const [min, max] = config.range;
+      const operator = ops[Math.floor(Math.random() * ops.length)];
+
+      let a, b, expression;
+      if (operator === "√") {
+        a = Math.floor(Math.sqrt(Math.floor(Math.random() * (max - min + 1) + min)));
+        expression = `√${a * a}`;
+        currentAnswer = a;
+      } else {
+        a = Math.floor(Math.random() * (max - min + 1) + min);
+        b = Math.floor(Math.random() * (max - min + 1) + min);
+        expression = `${a} ${operator} ${b}`;
+        currentAnswer = eval(expression);
+      }
+
+      let options = [];
+      if (isMCQ) {
+        options.push(currentAnswer);
+        while (options.length < 4) {
+          let option = currentAnswer + Math.floor(Math.random() * 10 - 5);
+          if (!options.includes(option)) options.push(option);
+        }
+        options = options.sort(() => Math.random() - 0.5);
+      }
+      return { text: expression, options };
+    }
+
+    function nextQuestion() {
+      if (currentQuestion >= totalQuestions) {
+        endGame();
+        return;
+      }
+
+      currentIsMCQ = currentQuestion < mcqLimit;
+      const q = generateQuestion(currentIsMCQ);
+      document.getElementById("question").textContent = `Soal ${currentQuestion + 1}: ${q.text}`;
+      document.getElementById("answer").style.display = currentIsMCQ ? "none" : "block";
+
+      const optionsContainer = document.getElementById("options");
+      optionsContainer.innerHTML = "";
+      if (currentIsMCQ) {
+        q.options.forEach(opt => {
+          const btn = document.createElement("button");
+          btn.textContent = opt;
+          btn.onclick = () => {
+            document.getElementById("answer").value = opt;
+          };
+          optionsContainer.appendChild(btn);
+        });
+      }
+      startTimer(timePerQuestion);
+      currentQuestion++;
+    }
+
+    function startTimer(seconds) {
+      clearInterval(timerInterval);
+      let timeLeft = seconds;
+      document.getElementById("timer").textContent = `Waktu: ${timeLeft}s`;
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        document.getElementById("timer").textContent = `Waktu: ${timeLeft}s`;
+        if (timeLeft <= 0) {
+          clearInterval(timerInterval);
+          submitAnswer();
+        }
+      }, 1000);
+    }
+
+    function submitAnswer() {
+      clearInterval(timerInterval);
+      const userAnswer = parseInt(document.getElementById("answer").value);
+      if (userAnswer === currentAnswer) {
+        correctAnswers++;
+      } else {
+        incorrectQuestions.push(`Soal ${currentQuestion}: ${currentAnswer}`);
+      }
+      nextQuestion();
+    }
+
+    function endGame() {
+      document.getElementById("quiz-screen").style.display = "none";
+      document.getElementById("result-screen").style.display = "block";
+      document.getElementById("result").textContent = `Benar: ${correctAnswers} dari ${totalQuestions}`;
+      document.getElementById("incorrect-questions").innerHTML = incorrectQuestions.map(q => `<li>${q}</li>`).join("");
+    }
+  </script>
+</body>
+</html>
