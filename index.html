@@ -2,285 +2,317 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Math Quiz Game</title>
+  <title>Login To Play A Game</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <style>
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      background: linear-gradient(to right, #e0f7fa, #ffffff);
-      margin: 0;
-    }
-    .container {
-      background: #ffffff;
-      padding: 2rem;
-      border-radius: 16px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-      max-width: 450px;
-      width: 100%;
-      text-align: center;
-    }
-    button {
-      margin: 0.5rem;
-      padding: 1rem 1.5rem;
-      font-size: 1rem;
-      border: none;
-      border-radius: 10px;
-      background: #007bff;
-      color: white;
-      cursor: pointer;
-      transition: background 0.3s, transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-    }
-    button:hover {
-      background: #0056b3;
-    }
-    button:active {
-      transform: scale(0.95);
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-    }
-    .question {
-      font-size: 1.4rem;
-      margin-bottom: 1rem;
-    }
-    .timer {
-      font-size: 1rem;
-      margin-bottom: 1rem;
-      color: #333;
-    }
-    input, .options button {
-      padding: 0.75rem;
-      width: 100%;
-      font-size: 1rem;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-    }
-    .options {
+      background: #111;
+      color: #fff;
+      font-family: Arial, sans-serif;
       display: flex;
       flex-direction: column;
-      gap: 0.3rem;
-      margin-bottom: 1rem;
-    }
-    .options button {
+      align-items: center;
+      height: 100vh;
       margin: 0;
-      transition: background 0.3s, transform 0.2s ease-in-out;
     }
-    .options button:hover {
-      background: #0056b3;
+
+    .login-box {
+      background: #222;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px #000;
+      width: 300px;
+      margin-top: auto;
+      margin-bottom: auto;
+      z-index: 2;
     }
-    .options button:active {
-      transform: scale(0.95);
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+
+    .login-box h2 {
+      text-align: center;
+      margin-bottom: 20px;
     }
-    .difficulty-text {
-      margin-top: 10px;
-      font-size: 1.2rem;
+
+    .login-box input, .login-box button {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border: none;
+      border-radius: 5px;
     }
-    .bgm-btn {
-      background-color: #28a745;
-      color: white;
-      font-size: 1rem;
-      padding: 1rem 1.5rem;
-      margin-top: 1rem;
+
+    .login-box button {
+      background: #007bff;
+      color: #fff;
       cursor: pointer;
     }
-    .bgm-btn:hover {
-      background-color: #218838;
+
+    .login-box button:hover {
+      background: #0056b3;
+    }
+
+    .preloader {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      transform: translate(-50%, -50%);
+      z-index: 10;
+    }
+
+    .preloader span {
+      display: block;
+      height: 15px;
+      width: 15px;
+      background: #190305;
+      margin: 0 7px;
+      border-radius: 18px;
+      animation: updown 1.25s infinite;
+    }
+
+    .preloader span:nth-child(1) { animation-delay: 0.15s; }
+    .preloader span:nth-child(2) { animation-delay: 0.3s; }
+    .preloader span:nth-child(3) { animation-delay: 0.45s; }
+    .preloader span:nth-child(4) { animation-delay: 0.6s; }
+    .preloader span:nth-child(5) { animation-delay: 0.75s; }
+
+    @keyframes updown {
+      0%, 100% { height: 15px; background: #19e345; }
+      50% { height: 60px; background: #033deb; }
+    }
+
+    .fade-in {
+      animation: fadeInUp 1s ease-out forwards;
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* New fade-out effect */
+    .fade-out {
+      animation: fadeOut 3s forwards;
+    }
+
+    @keyframes fadeOut {
+      from {
+        opacity: 1;
+      }
+      to {
+        opacity: 0;
+      }
+    }
+
+    #successMessage { display: none; }
+
+    #memoryGame { display: none; width: 100%; margin-top: 40px; }
+    #game-board {
+      display: grid;
+      grid-template-columns: repeat(4, 100px);
+      grid-template-rows: repeat(4, 100px);
+      gap: 10px;
+      justify-content: center;
+      margin: 20px auto;
+    }
+    .card {
+      width: 100px;
+      height: 100px;
+      background-color: #333;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 36px;
+      color: transparent;
+      cursor: pointer;
+      position: relative;
+      transition: transform 0.4s, background-color 0.3s, color 0.3s;
+    }
+    .card.flipped { background-color: white; color: #333; transform: rotateY(180deg); }
+    .card.matched { background-color: #046; color: #0f0; cursor: default; }
+    button.particle-button {
+      position: relative;
+      overflow: hidden;
+    }
+    .particle {
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      pointer-events: none;
+      animation: explode 0.6s ease-out forwards;
+    }
+    @keyframes explode {
+      0% { transform: translate(0, 0); opacity: 1; }
+      100% { transform: translate(var(--x), var(--y)); opacity: 0; }
+    }
+
+    .eye-icon {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <div id="start-screen">
-      <h2>Pilih Kesulitan</h2>
-      <button onclick="startGame('veryeasy')">Very Easy</button>
-      <button onclick="startGame('easy')">Easy</button>
-      <button onclick="startGame('medium')">Medium</button>
-      <button onclick="startGame('hard')">Hard</button>
-      <button onclick="startGame('veryhard')">Very Hard</button>
-      <button onclick="startGame('expert')">Expert</button>
-      <div class="difficulty-text">
-        <p><strong>Jumlah Soal:</strong></p>
-        <p>Very Easy: 5 soal</p>
-        <p>Easy: 10 soal</p>
-        <p>Medium: 15 soal</p>
-        <p>Hard: 20 soal</p>
-        <p>Very Hard: 30 soal</p>
-        <p>Expert: 40 soal</p>
+  <div class="login-box" id="loginBox">
+    <h2>Login</h2>
+    <form id="loginForm">
+      <input type="text" id="username" placeholder="Username" required>
+      <div class="relative">
+        <input type="password" id="password" placeholder="Password" required>
+        <i class="fas fa-eye eye-icon" id="togglePassword"></i>
       </div>
-      <button id="bgm-toggle-btn" class="bgm-btn" onclick="toggleBGM()">Putar Musik</button>
-    </div>
-
-    <div id="quiz-screen" style="display:none;">
-      <div class="question" id="question"></div>
-      <div class="timer" id="timer"></div>
-      <div class="options" id="options"></div>
-      <input type="number" id="answer" placeholder="Jawaban Anda" style="display:none;" />
-      <button onclick="submitAnswer()">Submit</button>
-    </div>
-
-    <div id="result-screen" style="display:none;">
-      <h2 id="result"></h2>
-      <h3>Hasil Detail</h3>
-      <ul id="incorrect-questions"></ul>
-      <button onclick="location.reload()">Main Lagi</button>
-    </div>
+      <button type="submit" class="particle-button">Login</button>
+    </form>
   </div>
 
-  <!-- Menambahkan Elemen Audio untuk BGM -->
-  <audio id="background-music" loop>
-    <source src="Vocaroo 173S3BxwpcvN.mp3" type="audio/mp3" />
-    Your browser does not support the audio element.
-  </audio>
-  
-  <!-- Menambahkan Elemen Audio untuk Musik "Hope to See You Again" -->
-  <audio id="hope-music" loop>
-    <source src="path_to_hope_to_see_you_again_instrumental.mp3" type="audio/mp3" />
-    Your browser does not support the audio element.
-  </audio>
+  <div class="preloader" id="preloader">
+    <span></span><span></span><span></span><span></span><span></span>
+  </div>
+
+  <div id="successMessage" class="bg-gray-800 p-8 rounded-2xl shadow-2xl max-w-md w-full text-center fade-in">
+    <h1 class="text-2xl md:text-3xl font-bold text-green-400">Berhasil Masuk Ke Dalam Game</h1>
+  </div>
+
+  <div id="memoryGame">
+    <h1 class="text-center text-blue-800 text-2xl mt-4">Memory Card Game</h1>
+    <div class="flex justify-center gap-4 mt-2">
+      <button id="start-button" class="particle-button bg-blue-500 px-4 py-2 rounded">Mulai Game</button>
+      <button id="reset-button" class="particle-button bg-red-500 px-4 py-2 rounded" disabled>Reset Game</button>
+    </div>
+    <div id="game-board"></div>
+  </div>
 
   <script>
-    let bgmPlaying = false;
-    const music = document.getElementById('background-music');
-    const hopeMusic = document.getElementById('hope-music');
-    
-    function toggleBGM() {
-      if (bgmPlaying) {
-        music.pause(); // Hentikan musik Fukashigi no Carte
-        hopeMusic.pause(); // Hentikan musik Hope to See You Again
-        document.getElementById('bgm-toggle-btn').textContent = "Putar Musik";
+    const board = document.getElementById("game-board");
+    const resetButton = document.getElementById("reset-button");
+    const startButton = document.getElementById("start-button");
+
+    const appIcons = [
+      "fa-android", "fa-apple", "fa-facebook", "fa-twitter",
+      "fa-google", "fa-linkedin", "fa-instagram", "fa-youtube",
+      "fa-android", "fa-apple", "fa-facebook", "fa-twitter",
+      "fa-google", "fa-linkedin", "fa-instagram", "fa-youtube"
+    ];
+
+    let cards = [];
+    let flippedCards = [];
+    let matchedCount = 0;
+
+    function createCard(iconClass) {
+      const card = document.createElement("div");
+      card.classList.add("card");
+      card.dataset.icon = iconClass;
+      card.innerHTML = `<i class="fab ${iconClass}"></i>`;
+      card.addEventListener("click", flipCard);
+      return card;
+    }
+
+    function initializeGame() {
+      cards = [];
+      flippedCards = [];
+      matchedCount = 0;
+      board.innerHTML = "";
+
+      const shuffledIcons = appIcons.sort(() => Math.random() - 0.5);
+      shuffledIcons.forEach(iconClass => {
+        const card = createCard(iconClass);
+        board.appendChild(card);
+        cards.push(card);
+      });
+    }
+
+    function flipCard() {
+      if (flippedCards.length >= 2 || this.classList.contains("flipped") || this.classList.contains("matched")) return;
+      this.classList.add("flipped");
+      flippedCards.push(this);
+      if (flippedCards.length === 2) setTimeout(checkForMatch, 500);
+    }
+
+    function checkForMatch() {
+      const [card1, card2] = flippedCards;
+      if (card1.dataset.icon === card2.dataset.icon) {
+        card1.classList.add("matched");
+        card2.classList.add("matched");
+        matchedCount += 2;
+        if (matchedCount === appIcons.length) setTimeout(() => alert("Selamat! Semua kartu cocok!"), 1000);
       } else {
-        music.play(); // Mulai musik Fukashigi no Carte
-        hopeMusic.play(); // Mulai musik Hope to See You Again
-        music.volume = 0.5; // Atur volume musik Fukashigi no Carte
-        hopeMusic.volume = 0.5; // Atur volume musik Hope to See You Again
-        document.getElementById('bgm-toggle-btn').textContent = "Hentikan Musik";
+        card1.classList.remove("flipped");
+        card2.classList.remove("flipped");
       }
-      bgmPlaying = !bgmPlaying;
+      flippedCards = [];
     }
 
-    const difficulties = {
-      veryeasy: { total: 5, mcq: 3, time: 25, operators: ["+"], range: [1, 10] },
-      easy: { total: 10, mcq: 5, time: 20, operators: ["+", "-"], range: [1, 20] },
-      medium: { total: 15, mcq: 8, time: 15, operators: ["+", "-", "/"], range: [21, 39] },
-      hard: { total: 20, mcq: 12, time: 10, operators: ["+", "-", "*", "/"], range: [40, 59] },
-      veryhard: { total: 30, mcq: 18, time: 8, operators: ["+", "-", "*", "/"], range: [60, 99] },
-      expert: { total: 40, mcq: 20, time: 7, operators: ["+", "-", "*", "/", "√"], range: [100, 200] },
-    };
-
-    let currentDifficulty = "";
-    let currentQuestion = 0;
-    let correctAnswers = 0;
-    let totalQuestions = 0;
-    let timePerQuestion = 0;
-    let mcqLimit = 0;
-    let currentAnswer = 0;
-    let timerInterval;
-    let currentIsMCQ = true;
-    let incorrectQuestions = [];
-
-    function startGame(difficulty) {
-      currentDifficulty = difficulty;
-      const config = difficulties[difficulty];
-      totalQuestions = config.total;
-      mcqLimit = config.mcq;
-      timePerQuestion = config.time;
-      incorrectQuestions = [];
-      document.getElementById("start-screen").style.display = "none";
-      document.getElementById("quiz-screen").style.display = "block";
-      nextQuestion();
+    function animateCardReset() {
+      cards.forEach((card, index) => {
+        setTimeout(() => card.classList.remove("flipped", "matched"), index * 50);
+      });
     }
 
-    function generateQuestion(isMCQ) {
-      const config = difficulties[currentDifficulty];
-      const ops = config.operators;
-      const [min, max] = config.range;
-      const operator = ops[Math.floor(Math.random() * ops.length)];
+    function showParticles(button) {
+      for (let i = 0; i < 20; i++) {
+        const particle = document.createElement("div");
+        particle.classList.add("particle");
+        const color = `hsl(${Math.random() * 360}, 100%, 60%)`;
+        const angle = Math.random() * 2 * Math.PI;
+        const distance = Math.random() * 80;
+        particle.style.background = color;
+        particle.style.setProperty('--x', `${Math.cos(angle) * distance}px`);
+        particle.style.setProperty('--y', `${Math.sin(angle) * distance}px`);
+        button.appendChild(particle);
+        setTimeout(() => particle.remove(), 600);
+      }
+    }
 
-      let a, b, expression;
-      if (operator === "√") {
-        a = Math.floor(Math.sqrt(Math.floor(Math.random() * (max - min + 1) + min)));
-        expression = `√${a * a}`;
-        currentAnswer = a;
+    resetButton.addEventListener("click", () => {
+      animateCardReset();
+      setTimeout(initializeGame, cards.length * 50 + 300);
+      showParticles(resetButton);
+    });
+
+    startButton.addEventListener("click", () => {
+      initializeGame();
+      resetButton.disabled = false;
+      startButton.disabled = true;
+      showParticles(startButton);
+    });
+
+    document.getElementById('loginForm').addEventListener('submit', function(event) {
+      event.preventDefault();
+      const user = document.getElementById('username').value.trim();
+      const pass = document.getElementById('password').value.trim();
+      if (user === 'zafran' && pass === 'zafran123') {
+        document.getElementById('loginBox').style.display = 'none';
+        document.getElementById('preloader').style.display = 'flex';
+        setTimeout(() => {
+          document.getElementById('preloader').style.display = 'none';
+          document.getElementById('successMessage').style.display = 'block';
+          document.getElementById('memoryGame').style.display = 'block';
+
+          // Make success message fade out after 3 seconds
+          setTimeout(() => {
+            document.getElementById('successMessage').classList.add('fade-out');
+          }, 3000);
+
+        }, 5000);
       } else {
-        a = Math.floor(Math.random() * (max - min + 1) + min);
-        b = Math.floor(Math.random() * (max - min + 1) + min);
-        expression = `${a} ${operator} ${b}`;
-        currentAnswer = eval(expression);
+        alert('Username atau password salah!');
       }
+    });
 
-      let options = [];
-      if (isMCQ) {
-        options.push(currentAnswer);
-        while (options.length < 4) {
-          let option = currentAnswer + Math.floor(Math.random() * 10 - 5);
-          if (!options.includes(option)) options.push(option);
-        }
-        options = options.sort(() => Math.random() - 0.5);
-      }
-      return { text: expression, options };
-    }
-
-    function nextQuestion() {
-      if (currentQuestion >= totalQuestions) {
-        endGame();
-        return;
-      }
-
-      currentIsMCQ = currentQuestion < mcqLimit;
-      const q = generateQuestion(currentIsMCQ);
-      document.getElementById("question").textContent = `Soal ${currentQuestion + 1}: ${q.text}`;
-      document.getElementById("answer").style.display = currentIsMCQ ? "none" : "block";
-
-      const optionsContainer = document.getElementById("options");
-      optionsContainer.innerHTML = "";
-      if (currentIsMCQ) {
-        q.options.forEach(opt => {
-          const btn = document.createElement("button");
-          btn.textContent = opt;
-          btn.onclick = () => {
-            document.getElementById("answer").value = opt;
-          };
-          optionsContainer.appendChild(btn);
-        });
-      }
-      startTimer(timePerQuestion);
-      currentQuestion++;
-    }
-
-    function startTimer(seconds) {
-      clearInterval(timerInterval);
-      let timeLeft = seconds;
-      document.getElementById("timer").textContent = `Waktu: ${timeLeft}s`;
-      timerInterval = setInterval(() => {
-        timeLeft--;
-        document.getElementById("timer").textContent = `Waktu: ${timeLeft}s`;
-        if (timeLeft <= 0) {
-          clearInterval(timerInterval);
-          submitAnswer();
-        }
-      }, 1000);
-    }
-
-    function submitAnswer() {
-      clearInterval(timerInterval);
-      const userAnswer = parseInt(document.getElementById("answer").value);
-      if (userAnswer === currentAnswer) {
-        correctAnswers++;
-      } else {
-        incorrectQuestions.push(`Soal ${currentQuestion}: ${currentAnswer}`);
-      }
-      nextQuestion();
-    }
-
-    function endGame() {
-      document.getElementById("quiz-screen").style.display = "none";
-      document.getElementById("result-screen").style.display = "block";
-      document.getElementById("result").textContent = `Benar: ${correctAnswers} dari ${totalQuestions}`;
-      document.getElementById("incorrect-questions").innerHTML = incorrectQuestions.map(q => `<li>${q}</li>`).join("");
-    }
+    // Toggle password visibility
+    document.getElementById("togglePassword").addEventListener("click", function () {
+      const passwordField = document.getElementById("password");
+      const type = passwordField.type === "password" ? "text" : "password";
+      passwordField.type = type;
+      this.classList.toggle("fa-eye-slash");
+    });
   </script>
 </body>
 </html>
